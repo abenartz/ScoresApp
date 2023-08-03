@@ -1,8 +1,8 @@
-package com.example.scoresapp
+package com.example.scoresapp.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import timber.log.Timber
+import com.example.scoresapp.R
 
 class MainActivity : AppCompatActivity() {
 

@@ -5,13 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.scoresapp.Constants.APP_DEBUG
-import com.example.scoresapp.R
+import com.example.scoresapp.api.responses.MatchData
 import com.example.scoresapp.databinding.MatchListItemBinding
 import com.example.scoresapp.extensions.load
-import com.example.scoresapp.viewmodels.MatchData
-import timber.log.Timber
 
 class MatchAdapter(
     private val onItemClicked: ((MatchData) -> Unit)
