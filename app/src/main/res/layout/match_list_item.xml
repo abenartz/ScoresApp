@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="12dp"
+    android:elevation="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <TextView
+            android:id="@+id/text_team_name_home"
+            android:layout_width="@dimen/team_name_width"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_team_name_from_logo"
+            android:gravity="end"
+            android:maxLines="3"
+            android:text="Team home"
+            app:layout_constraintEnd_toStartOf="@+id/image_team_home"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageView
+            android:id="@+id/image_team_home"
+            android:layout_width="@dimen/logo_team_width"
+            android:layout_height="@dimen/logo_team_width"
+            android:layout_marginEnd="@dimen/margin_logo_from_score"
+            android:src="@drawable/ic_launcher_foreground"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/text_score_home"/>
+
+        <TextView
+            android:id="@+id/text_score_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_score_from_separator"
+            android:text="0"
+            app:layout_constraintEnd_toStartOf="@+id/text_separator"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/text_separator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/text_score_away"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_score_from_separator"
+            android:text="0"
+            app:layout_constraintStart_toEndOf="@+id/text_separator"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/image_team_away"
+            android:layout_width="@dimen/logo_team_width"
+            android:layout_height="@dimen/logo_team_width"
+            android:layout_marginStart="@dimen/margin_logo_from_score"
+            android:src="@drawable/ic_launcher_foreground"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/text_score_away"/>
+
+        <TextView
+            android:id="@+id/text_team_name_away"
+            android:layout_width="@dimen/team_name_width"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_team_name_from_logo"
+            android:gravity="start"
+            android:maxLines="3"
+            android:text="Team away"
+            app:layout_constraintStart_toEndOf="@+id/image_team_away"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

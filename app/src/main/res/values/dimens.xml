@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="logo_team_width">30dp</dimen>
+    <dimen name="margin_team_name_from_logo">12dp</dimen>
+    <dimen name="margin_logo_from_score">12dp</dimen>
+    <dimen name="margin_score_from_separator">12dp</dimen>
+    <dimen name="recycler_match_cards_margin">8dp</dimen>
+    <dimen name="team_name_width">100dp</dimen>
+</resources>
