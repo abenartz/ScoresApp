@@ -9,6 +9,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.example.scoresapp.constants.Constants.APP_DEBUG
 import com.example.scoresapp.R
 import com.example.scoresapp.adapters.MatchAdapter
@@ -76,7 +78,7 @@ class MatchListFragment: Fragment(R.layout.fragment_match_list) {
         matchAdapter = MatchAdapter(
             onItemClicked = { match ->
                 Timber.tag(APP_DEBUG).d("MatchListFragment: onItemClicked: selectedMatch = $match")
-//                findNavController().navigate()
+                findNavController().navigate(R.id.action_matchListFragment_to_matchStoryFragment)
             }
         )
         with(binding.matchRecyclerView) {
