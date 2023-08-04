@@ -16,9 +16,9 @@ import com.example.scoresapp.adapters.MatchAdapter
 import com.example.scoresapp.databinding.FragmentMatchListBinding
 import com.example.scoresapp.extensions.displaySnackBar
 import com.example.scoresapp.extensions.showView
+import com.example.scoresapp.ui.UiState
 import com.example.scoresapp.utils.TopSpacingItemDecoration
 import com.example.scoresapp.viewmodels.MainViewModel
-import com.example.scoresapp.viewmodels.UiState
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -38,6 +38,7 @@ class MatchListFragment: Fragment(R.layout.fragment_match_list) {
             viewModel.readDataFromJson(it)
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,7 +47,6 @@ class MatchListFragment: Fragment(R.layout.fragment_match_list) {
         _binding = FragmentMatchListBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initRecyclerView()
@@ -77,11 +77,11 @@ class MatchListFragment: Fragment(R.layout.fragment_match_list) {
         matchAdapter = MatchAdapter(
             onItemClicked = { match ->
                 Timber.tag(APP_DEBUG).d("MatchListFragment: onItemClicked: selectedMatch = $match")
-                if (match.wscGame?.name == "No story for this game") {
-                    binding.root.displaySnackBar("No story for this game")
-                } else {
-                    viewModel.storyUrl = match.wscGame?.primeStory?.pages?.mapNotNull { it.videoUrl } ?: emptyList()
+                if (match.isValidData()) {
+                    viewModel.storyPages = match.wscGame?.primeStory?.pages ?: emptyList()
                     findNavController().navigate(R.id.action_matchListFragment_to_matchStoryFragment)
+                } else {
+                    binding.root.displaySnackBar("No story for this game")
                 }
             }
         )

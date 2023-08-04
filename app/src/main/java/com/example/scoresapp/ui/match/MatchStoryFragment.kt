@@ -12,8 +12,10 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import com.example.scoresapp.R
 import com.example.scoresapp.constants.Constants
+import com.example.scoresapp.constants.Constants.APP_DEBUG
 import com.example.scoresapp.databinding.FragmentMatchStoryBinding
 import com.example.scoresapp.viewmodels.MainViewModel
+import jp.shts.android.storiesprogressview.StoriesProgressView
 import timber.log.Timber
 
 class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
@@ -39,11 +41,13 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
             MotionEvent.ACTION_DOWN -> {
                 pressTime = System.currentTimeMillis();
                 player?.pause()
+                binding.progressStories.pause()
                 return@OnTouchListener false
             }
             MotionEvent.ACTION_UP -> {
                 val now = System.currentTimeMillis()
                 player?.play()
+                binding.progressStories.resume()
                 return@OnTouchListener pressLimit < now - pressTime
             }
             else -> false
@@ -61,6 +65,7 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setClickListeners()
+        setupStoriesProgressView()
     }
 
     override fun onStart() {
@@ -81,22 +86,49 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
         with(binding) {
             backwardView.setOnClickListener {
                 player?.playPreviousVideo()
+                progressStories.reverse()
             }
             forwardView.setOnClickListener {
                 player?.playNextVideo()
+                progressStories.skip()
             }
             backwardView.setOnTouchListener(onTouchListener)
             forwardView.setOnTouchListener(onTouchListener)
         }
     }
 
+    private fun setupStoriesProgressView() {
+        with(binding.progressStories) {
+            setStoriesCount(viewModel.storyPages.size)
+            val durations = viewModel.storyPages.map { it.duration?.toLong() ?: 0L }
+                .also { Timber.tag(APP_DEBUG).d("MatchStoryFragment: setupStoriesProgressView: durations = $it") }
+                .toLongArray()
+            setStoriesCountWithDurations(durations)
+            setStoriesListener(object : StoriesProgressView.StoriesListener{
+                override fun onNext() {
+                    Timber.tag(APP_DEBUG).d("MatchStoryFragment: StoriesListener: onNext..")
+                }
+
+                override fun onPrev() {
+                    Timber.tag(APP_DEBUG).d("MatchStoryFragment: StoriesListener: onPrev..")
+                }
+
+                override fun onComplete() {
+                    Timber.tag(APP_DEBUG).d("MatchStoryFragment: StoriesListener: onComplete..")
+                }
+
+            })
+            startStories()
+        }
+    }
+
     private fun initializePlayer() {
         context?.let { context ->
-            Timber.tag(Constants.APP_DEBUG).d("MatchStoryFragment: initMediaPlayer: num of stories = ${viewModel.storyUrl.size}")
+            Timber.tag(APP_DEBUG).d("MatchStoryFragment: initMediaPlayer: num of stories = ${viewModel.storyPages.size}")
             player = ExoPlayer.Builder(context).build().apply {
                 binding.playerView.player = this
                 binding.playerView.useController = false
-                val mediaItems = viewModel.storyUrl.map { MediaItem.fromUri(it) }
+                val mediaItems = viewModel.storyPages.map { MediaItem.fromUri(it.videoUrl ?: "") }
                 setMediaItems(mediaItems, mediaItemIndex, playbackPosition)
                 playWhenReady = true
                 setMenuVisibility(false)
@@ -113,6 +145,7 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
         }
     }
 
+    // TODO: handle bg pause of progress view 
     private fun releasePlayer() {
         player?.let { exoPlayer ->
             playbackPosition = exoPlayer.currentPosition
@@ -121,6 +154,22 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
             exoPlayer.release()
         }
         player = null
+    }
+
+    private fun ExoPlayer.playNextVideo() {
+        if (hasNextMediaItem()) {
+            seekToNext()
+        } else {
+            findNavController().popBackStack()
+        }
+    }
+
+    private fun ExoPlayer.playPreviousVideo() {
+        if (hasPreviousMediaItem()) {
+            seekToPreviousMediaItem()
+        } else {
+            findNavController().popBackStack()
+        }
     }
 
     override fun onPause() {
@@ -139,22 +188,8 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
     }
     override fun onDestroy() {
         super.onDestroy()
+        binding.progressStories.destroy()
         _binding = null
     }
 
-    private fun ExoPlayer.playNextVideo() {
-        if (hasNextMediaItem()) {
-            seekToNext()
-        } else {
-            findNavController().popBackStack()
-        }
-    }
-
-    private fun ExoPlayer.playPreviousVideo() {
-        if (hasPreviousMediaItem()) {
-            seekToPrevious()
-        } else {
-            findNavController().popBackStack()
-        }
-    }
 }

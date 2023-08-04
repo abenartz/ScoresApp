@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.scoresapp.api.responses.GetMatchesResponse
 import com.example.scoresapp.api.responses.MatchData
+import com.example.scoresapp.api.responses.Page
 import com.example.scoresapp.constants.Constants.APP_DEBUG
 import com.example.scoresapp.constants.Constants.RESPONSE_JSON_FILE_NAME
+import com.example.scoresapp.ui.UiState
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
@@ -20,13 +22,14 @@ import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
+import kotlin.time.Duration.Companion.seconds
 
 class MainViewModel: ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    var storyUrl: List<String> = emptyList()
+    var storyPages: List<Page> = emptyList()
 
     fun readDataFromJson(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -43,6 +46,10 @@ class MainViewModel: ViewModel() {
                     .build()
                 val adapter: JsonAdapter<GetMatchesResponse> = moshi.adapter(GetMatchesResponse::class.java)
                 val data: List<MatchData> = adapter.fromJson(json)?.response?.filter { it.wscGame != null } ?: emptyList()
+                // TODO: handle first duration different
+                data.forEach {
+                    it.wscGame?.primeStory?.pages?.firstOrNull()?.duration = 3000
+                }
                 _uiState.emit(UiState.Success(data))
             } catch (e: IOException) {
                 Timber.tag(APP_DEBUG).e("MatchListViewModel: readDataFromJson: IOException = $e")
@@ -55,8 +62,4 @@ class MainViewModel: ViewModel() {
     }
 }
 
-sealed interface UiState {
-    data class Error(val errMsg: String?): UiState
-    data class Success(val data: List<MatchData>): UiState
-    object Loading: UiState
-}
+

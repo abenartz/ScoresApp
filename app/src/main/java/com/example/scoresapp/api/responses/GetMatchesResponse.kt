@@ -10,7 +10,11 @@ data class MatchData(
     val league: League?,
     val wscGame: WSCGame?,
     val WSCGameId: String?,
-)
+) {
+    fun isValidData(): Boolean {
+        return wscGame?.name != "No story for this game" && !wscGame?.primeStory?.pages.isNullOrEmpty()
+    }
+}
 
 data class Teams(
     val away: Team?,
@@ -52,15 +56,10 @@ data class PrimeStory(
 )
 
 data class Page(
-    val duration: Int?,
-    val eventType: String?,
+    var duration: Int?,
     val paggeId: String?,
     val videoUrl: String?,
-    val period: String?,
-    val title: String?,
     val awayScore: Int?,
     val actionType: String?,
-    val gameClock: String?,
-    val rating: Int?,
     val homeScore: Int?
 )
