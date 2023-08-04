@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.scoresapp.constants.Constants.APP_DEBUG
 import com.example.scoresapp.R
@@ -18,14 +17,14 @@ import com.example.scoresapp.databinding.FragmentMatchListBinding
 import com.example.scoresapp.extensions.displaySnackBar
 import com.example.scoresapp.extensions.showView
 import com.example.scoresapp.utils.TopSpacingItemDecoration
-import com.example.scoresapp.viewmodels.MatchListViewModel
+import com.example.scoresapp.viewmodels.MainViewModel
 import com.example.scoresapp.viewmodels.UiState
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MatchListFragment: Fragment(R.layout.fragment_match_list) {
 
-    private val viewModel by activityViewModels<MatchListViewModel>()
+    private val viewModel by activityViewModels<MainViewModel>()
     private var matchAdapter: MatchAdapter? = null
 
     // Google recommendation avoiding memory leaks
@@ -78,7 +77,12 @@ class MatchListFragment: Fragment(R.layout.fragment_match_list) {
         matchAdapter = MatchAdapter(
             onItemClicked = { match ->
                 Timber.tag(APP_DEBUG).d("MatchListFragment: onItemClicked: selectedMatch = $match")
-                findNavController().navigate(R.id.action_matchListFragment_to_matchStoryFragment)
+                if (match.wscGame?.name == "No story for this game") {
+                    binding.root.displaySnackBar("No story for this game")
+                } else {
+                    viewModel.storyUrl = match.wscGame?.primeStory?.pages?.mapNotNull { it.videoUrl } ?: emptyList()
+                    findNavController().navigate(R.id.action_matchListFragment_to_matchStoryFragment)
+                }
             }
         )
         with(binding.matchRecyclerView) {

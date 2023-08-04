@@ -52,10 +52,10 @@ data class PrimeStory(
 )
 
 data class Page(
-    val duration: Int,
+    val duration: Int?,
     val eventType: String?,
-    val paggeId: String,
-    val videoUrl: String,
+    val paggeId: String?,
+    val videoUrl: String?,
     val period: String?,
     val title: String?,
     val awayScore: Int?,

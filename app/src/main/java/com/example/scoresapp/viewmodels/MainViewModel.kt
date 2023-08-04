@@ -21,11 +21,12 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.Charset
 
-class MatchListViewModel: ViewModel() {
+class MainViewModel: ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    var storyUrl: List<String> = emptyList()
 
     fun readDataFromJson(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
