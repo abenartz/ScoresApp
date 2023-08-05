@@ -18,26 +18,18 @@ import com.example.scoresapp.extensions.displaySnackBar
 import com.example.scoresapp.extensions.showView
 import com.example.scoresapp.ui.UiState
 import com.example.scoresapp.utils.TopSpacingItemDecoration
-import com.example.scoresapp.viewmodels.MainViewModel
+import com.example.scoresapp.viewmodels.MatchViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MatchListFragment: Fragment(R.layout.fragment_match_list) {
 
-    private val viewModel by activityViewModels<MainViewModel>()
+    private val viewModel by activityViewModels<MatchViewModel>()
     private var matchAdapter: MatchAdapter? = null
 
     // Google recommendation avoiding memory leaks
     private var _binding: FragmentMatchListBinding? = null
     private val binding get() = _binding!!
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Timber.tag(APP_DEBUG).d("MatchListFragment: onCreate:")
-        context?.let {
-            viewModel.readDataFromJson(it)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,7 +70,7 @@ class MatchListFragment: Fragment(R.layout.fragment_match_list) {
             onItemClicked = { match ->
                 Timber.tag(APP_DEBUG).d("MatchListFragment: onItemClicked: selectedMatch = $match")
                 if (match.isValidData()) {
-                    viewModel.storyPages = match.wscGame?.primeStory?.pages ?: emptyList()
+                    viewModel.currStoryPages = match.wscGame?.primeStory?.pages ?: emptyList()
                     findNavController().navigate(R.id.action_matchListFragment_to_matchStoryFragment)
                 } else {
                     binding.root.displaySnackBar("No story for this game")

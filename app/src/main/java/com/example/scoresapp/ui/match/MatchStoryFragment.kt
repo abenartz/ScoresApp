@@ -8,15 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.navigation.fragment.findNavController
 import com.example.scoresapp.R
 import com.example.scoresapp.constants.Constants.APP_DEBUG
 import com.example.scoresapp.databinding.FragmentMatchStoryBinding
-import com.example.scoresapp.viewmodels.MainViewModel
-import jp.shts.android.storiesprogressview.StoriesProgressView
+import com.example.scoresapp.viewmodels.MatchViewModel
 import timber.log.Timber
 
 class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
@@ -30,7 +27,7 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
     // TODO: maybe can remove if prefetch
     private var isFirstTime = true
 
-    private val viewModel by activityViewModels<MainViewModel>()
+    private val viewModel by activityViewModels<MatchViewModel>()
     private var player: ExoPlayer? = null
 
     private var _binding: FragmentMatchStoryBinding? = null
@@ -102,19 +99,19 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
 
     private fun setupStoriesProgressView() {
         with(binding.progressStories) {
-            setStoriesCount(viewModel.storyPages.size)
-            val durations = viewModel.storyPages.map { it.duration?.toLong() ?: 0L }.toLongArray()
+            setStoriesCount(viewModel.currStoryPages.size)
+            val durations = viewModel.currStoryPages.map { it.duration?.toLong() ?: 0L }.toLongArray()
             setStoriesCountWithDurations(durations)
         }
     }
 
     private fun initializePlayer() {
         context?.let { context ->
-            Timber.tag(APP_DEBUG).d("MatchStoryFragment: initMediaPlayer: num of stories = ${viewModel.storyPages.size}")
+            Timber.tag(APP_DEBUG).d("MatchStoryFragment: initMediaPlayer: num of stories = ${viewModel.currStoryPages.size}")
             player = ExoPlayer.Builder(context).build().apply {
                 binding.playerView.player = this
                 binding.playerView.useController = false
-                val mediaItems = viewModel.storyPages.map { MediaItem.fromUri(it.videoUrl ?: "") }
+                val mediaItems = viewModel.currStoryPages.map { MediaItem.fromUri(it.videoUrl ?: "") }
                 setMediaItems(mediaItems, mediaItemIndex, playbackPosition)
                 playWhenReady = true
                 setMenuVisibility(false)
