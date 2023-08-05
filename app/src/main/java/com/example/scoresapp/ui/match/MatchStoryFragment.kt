@@ -8,10 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.navigation.fragment.findNavController
 import com.example.scoresapp.R
-import com.example.scoresapp.constants.Constants
 import com.example.scoresapp.constants.Constants.APP_DEBUG
 import com.example.scoresapp.databinding.FragmentMatchStoryBinding
 import com.example.scoresapp.viewmodels.MainViewModel
@@ -26,6 +27,8 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
 
     private var pressTime = 0L
     private var pressLimit = 500L
+    // TODO: maybe can remove if prefetch
+    private var isFirstTime = true
 
     private val viewModel by activityViewModels<MainViewModel>()
     private var player: ExoPlayer? = null
@@ -85,12 +88,12 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
     private fun setClickListeners() {
         with(binding) {
             backwardView.setOnClickListener {
-                player?.playPreviousVideo()
                 progressStories.reverse()
+                player?.playPreviousVideo()
             }
             forwardView.setOnClickListener {
-                player?.playNextVideo()
                 progressStories.skip()
+                player?.playNextVideo()
             }
             backwardView.setOnTouchListener(onTouchListener)
             forwardView.setOnTouchListener(onTouchListener)
@@ -100,25 +103,8 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
     private fun setupStoriesProgressView() {
         with(binding.progressStories) {
             setStoriesCount(viewModel.storyPages.size)
-            val durations = viewModel.storyPages.map { it.duration?.toLong() ?: 0L }
-                .also { Timber.tag(APP_DEBUG).d("MatchStoryFragment: setupStoriesProgressView: durations = $it") }
-                .toLongArray()
+            val durations = viewModel.storyPages.map { it.duration?.toLong() ?: 0L }.toLongArray()
             setStoriesCountWithDurations(durations)
-            setStoriesListener(object : StoriesProgressView.StoriesListener{
-                override fun onNext() {
-                    Timber.tag(APP_DEBUG).d("MatchStoryFragment: StoriesListener: onNext..")
-                }
-
-                override fun onPrev() {
-                    Timber.tag(APP_DEBUG).d("MatchStoryFragment: StoriesListener: onPrev..")
-                }
-
-                override fun onComplete() {
-                    Timber.tag(APP_DEBUG).d("MatchStoryFragment: StoriesListener: onComplete..")
-                }
-
-            })
-            startStories()
         }
     }
 
@@ -132,25 +118,35 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
                 setMediaItems(mediaItems, mediaItemIndex, playbackPosition)
                 playWhenReady = true
                 setMenuVisibility(false)
-                addListener(object : Player.Listener {
-                    override fun onPlaybackStateChanged(playbackState: Int) {
-                        super.onPlaybackStateChanged(playbackState)
-                        if (playbackState == Player.STATE_ENDED) {
-                            findNavController().popBackStack()
-                        }
-                    }
-                })
+                addListener(playbackStateListener)
                 prepare()
             }
         }
     }
 
-    // TODO: handle bg pause of progress view 
+    private val playbackStateListener = object : Player.Listener {
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            when (playbackState) {
+                Player.STATE_ENDED -> {
+                    findNavController().popBackStack()
+                }
+                Player.STATE_READY -> {
+                    binding.progressStories.resume()
+                    if (isFirstTime)  {
+                        isFirstTime = false
+                        binding.progressStories.startStories()
+                    }
+                }
+            }
+        }
+    }
+
     private fun releasePlayer() {
         player?.let { exoPlayer ->
             playbackPosition = exoPlayer.currentPosition
             mediaItemIndex = exoPlayer.currentMediaItemIndex
             playWhenReady = exoPlayer.playWhenReady
+            exoPlayer.removeListener(playbackStateListener)
             exoPlayer.release()
         }
         player = null
@@ -177,6 +173,7 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
         if (Build.VERSION.SDK_INT <= 23) {
             releasePlayer()
         }
+        binding.progressStories.pause()
     }
 
 
@@ -187,9 +184,10 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
         }
     }
     override fun onDestroy() {
-        super.onDestroy()
         binding.progressStories.destroy()
         _binding = null
+        super.onDestroy()
+
     }
 
 }

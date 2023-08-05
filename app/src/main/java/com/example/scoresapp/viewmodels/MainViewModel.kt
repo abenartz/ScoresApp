@@ -45,7 +45,7 @@ class MainViewModel: ViewModel() {
                     .add(KotlinJsonAdapterFactory())
                     .build()
                 val adapter: JsonAdapter<GetMatchesResponse> = moshi.adapter(GetMatchesResponse::class.java)
-                val data: List<MatchData> = adapter.fromJson(json)?.response?.filter { it.wscGame != null } ?: emptyList()
+                val data: List<MatchData> = adapter.fromJson(json)?.response?.filter { it.wscGame?.primeStory?.pages != null } ?: emptyList()
                 // TODO: handle first duration different
                 data.forEach {
                     it.wscGame?.primeStory?.pages?.firstOrNull()?.duration = 3000
