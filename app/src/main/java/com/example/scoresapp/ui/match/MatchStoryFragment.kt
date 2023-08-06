@@ -1,45 +1,42 @@
 package com.example.scoresapp.ui.match
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.media3.common.MediaItem
+import androidx.fragment.app.viewModels
+import androidx.media3.common.IllegalSeekPositionException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import com.example.scoresapp.R
 import com.example.scoresapp.constants.Constants.APP_DEBUG
 import com.example.scoresapp.databinding.FragmentMatchStoryBinding
+import com.example.scoresapp.extensions.toDurationArray
+import com.example.scoresapp.extensions.toMediaItems
+import com.example.scoresapp.ui.MainActivity
 import com.example.scoresapp.viewmodels.MatchViewModel
+import com.example.scoresapp.viewmodels.StoryViewModel
 import timber.log.Timber
+
 
 class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
 
-    private var playWhenReady = true
-    private var mediaItemIndex = 0
-    private var playbackPosition = 0L
-
-    private var pressTime = 0L
-    private var pressLimit = 500L
-    // TODO: maybe can remove if prefetch
-    private var isFirstTime = true
-
-    private val viewModel by activityViewModels<MatchViewModel>()
+    private val activityViewModel by activityViewModels<MatchViewModel>()
+    private val viewModel by viewModels<StoryViewModel>()
     private var player: ExoPlayer? = null
 
     private var _binding: FragmentMatchStoryBinding? = null
     private val binding get() = _binding!!
 
-
-
     @SuppressLint("ClickableViewAccessibility")
     private val onTouchListener = View.OnTouchListener { _, event ->
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                pressTime = System.currentTimeMillis();
+                viewModel.pressTime = System.currentTimeMillis();
                 player?.pause()
                 binding.progressStories.pause()
                 return@OnTouchListener false
@@ -48,7 +45,7 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
                 val now = System.currentTimeMillis()
                 player?.play()
                 binding.progressStories.resume()
-                return@OnTouchListener pressLimit < now - pressTime
+                return@OnTouchListener PRESS_LIMIT < now - viewModel.pressTime
             }
             else -> false
         }
@@ -64,6 +61,7 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        (activity as? MainActivity)?.setWindowNavigationAndStatusColor(Color.BLACK)
         setClickListeners()
         setupStoriesProgressView()
     }
@@ -99,24 +97,31 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
 
     private fun setupStoriesProgressView() {
         with(binding.progressStories) {
-            setStoriesCount(viewModel.currStoryPages.size)
-            val durations = viewModel.currStoryPages.map { it.duration?.toLong() ?: 0L }.toLongArray()
+            setStoriesCount(activityViewModel.currStoryPages.size)
+            val durations = activityViewModel.currStoryPages.toDurationArray()
             setStoriesCountWithDurations(durations)
+            startStories(viewModel.mediaItemIndex)
+            pause()
         }
     }
 
     private fun initializePlayer() {
         context?.let { context ->
-            Timber.tag(APP_DEBUG).d("MatchStoryFragment: initMediaPlayer: num of stories = ${viewModel.currStoryPages.size}")
+            Timber.tag(APP_DEBUG).d("MatchStoryFragment: initMediaPlayer: num of stories = ${activityViewModel.currStoryPages.size}")
             player = ExoPlayer.Builder(context).build().apply {
-                binding.playerView.player = this
-                binding.playerView.useController = false
-                val mediaItems = viewModel.currStoryPages.map { MediaItem.fromUri(it.videoUrl ?: "") }
-                setMediaItems(mediaItems, mediaItemIndex, playbackPosition)
-                playWhenReady = true
-                setMenuVisibility(false)
-                addListener(playbackStateListener)
-                prepare()
+                try {
+                    binding.playerView.player = this
+                    binding.playerView.useController = false
+                    val mediaItems = activityViewModel.currStoryPages.toMediaItems()
+                    setMediaItems(mediaItems, viewModel.mediaItemIndex, viewModel.playbackPosition)
+                    playWhenReady = true
+                    setMenuVisibility(false)
+                    addListener(playbackStateListener)
+                    prepare()
+                } catch (e: IllegalSeekPositionException) {
+                    Timber.tag(APP_DEBUG).e("MatchStoryFragment: initMediaPlayer: $e")
+                    findNavController().popBackStack()
+                }
             }
         }
     }
@@ -129,10 +134,6 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
                 }
                 Player.STATE_READY -> {
                     binding.progressStories.resume()
-                    if (isFirstTime)  {
-                        isFirstTime = false
-                        binding.progressStories.startStories()
-                    }
                 }
             }
         }
@@ -140,9 +141,11 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
 
     private fun releasePlayer() {
         player?.let { exoPlayer ->
-            playbackPosition = exoPlayer.currentPosition
-            mediaItemIndex = exoPlayer.currentMediaItemIndex
-            playWhenReady = exoPlayer.playWhenReady
+            with(viewModel) {
+                playbackPosition = exoPlayer.currentPosition
+                mediaItemIndex = exoPlayer.currentMediaItemIndex
+                playWhenReady = exoPlayer.playWhenReady
+            }
             exoPlayer.removeListener(playbackStateListener)
             exoPlayer.release()
         }
@@ -184,6 +187,11 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
         binding.progressStories.destroy()
         _binding = null
         super.onDestroy()
+
+    }
+    
+    companion object {
+        private const val PRESS_LIMIT = 500L
 
     }
 

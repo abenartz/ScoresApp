@@ -1,4 +1,4 @@
-package com.example.di
+package com.example.scoresapp.di
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

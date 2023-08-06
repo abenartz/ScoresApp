@@ -1,4 +1,4 @@
-package com.example.di.match
+package com.example.scoresapp.di.match
 
 import com.example.scoresapp.api.FakeMatchServiceApi
 import com.example.scoresapp.api.MatchServiceApi

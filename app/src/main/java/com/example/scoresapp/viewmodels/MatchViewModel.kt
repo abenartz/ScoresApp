@@ -21,16 +21,16 @@ class MatchViewModel @Inject constructor(
     private val repository: MatchRepository
 ): ViewModel() {
 
+    var currStoryPages: List<Page> = emptyList()
+
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
-
-    var currStoryPages: List<Page> = emptyList()
 
     init {
         fetchAllMatchesData()
     }
 
-    fun fetchAllMatchesData() {
+    private fun fetchAllMatchesData() {
         viewModelScope.launch {
             try {
                 val matches = repository.getMatches()
