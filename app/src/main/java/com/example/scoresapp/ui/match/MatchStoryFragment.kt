@@ -36,7 +36,7 @@ class MatchStoryFragment: Fragment(R.layout.fragment_match_story) {
     private val onTouchListener = View.OnTouchListener { _, event ->
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                viewModel.pressTime = System.currentTimeMillis();
+                viewModel.pressTime = System.currentTimeMillis()
                 player?.pause()
                 binding.progressStories.pause()
                 return@OnTouchListener false

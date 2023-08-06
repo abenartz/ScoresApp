@@ -12,11 +12,10 @@ class MatchRepository @Inject constructor(
 
     suspend fun getMatches(): List<MatchData> = withContext(Dispatchers.IO) {
         val result = serviceApi.getMatches()
-        val data = result?.response?.filter { it.wscGame?.primeStory?.pages != null } ?: emptyList()
-        // TODO: handle first duration different
-        data.forEach {
-            it.wscGame?.primeStory?.pages?.firstOrNull()?.duration = 3000
+        val onlyWscMatches = result?.response?.filter { it.isValidData() } ?: emptyList()
+        onlyWscMatches.forEach { data ->
+            data.wscGame?.primeStory?.pages?.retainAll { it.isDurationValid() }
         }
-        return@withContext data
+        return@withContext onlyWscMatches
     }
 }

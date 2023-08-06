@@ -48,7 +48,7 @@ data class WSCGame(
 
 data class PrimeStory(
     val storyId: String?,
-    val pages: List<Page>?,
+    var pages: MutableList<Page>?,
     val publishDate: String?,
     val storyThumbnail: String?,
     val title: String?,
@@ -56,10 +56,14 @@ data class PrimeStory(
 )
 
 data class Page(
-    var duration: Int?,
+    val duration: Int?,
     val paggeId: String?,
     val videoUrl: String?,
     val awayScore: Int?,
     val actionType: String?,
     val homeScore: Int?
-)
+) {
+    fun isDurationValid(): Boolean {
+        return duration != null && duration > 0
+    }
+}
