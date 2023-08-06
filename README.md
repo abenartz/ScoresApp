@@ -5,8 +5,7 @@ This app is showing highlight vedio moments of soccer matches like Instagram "St
 
 | Matches list                        | Story page                          |
 | ----------------------------------- | ----------------------------------- |
-| ![Matches list](https://github.com/abenartz/ScoresApp/assets/43881667/d38a6737-1f4f-4b8c-a6db-447fa4832089) | ![Story page](https://github.com/abenartz/ScoresApp/assets/43881667/43a31723-e58e-4c16-b5b6-125637abc891)
- |
+| ![image](https://github.com/abenartz/ScoresApp/assets/43881667/ff348211-040c-4d40-8eae-7129b69449eb) | ![image](https://github.com/abenartz/ScoresApp/assets/43881667/9f3b45ef-32f2-4514-9936-c950b159ce30) |
 
 
 ## Features and 3rd party libraries
