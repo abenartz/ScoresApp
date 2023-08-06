@@ -2,8 +2,12 @@
 This app is showing highlight vedio moments of soccer matches like Instagram "Stories".
 
 ## Screens:
-1. Matches list
-2. Story page
+
+| Matches list                        | Story page                          |
+| ----------------------------------- | ----------------------------------- |
+| ![Matches list](https://github.com/abenartz/ScoresApp/assets/43881667/d38a6737-1f4f-4b8c-a6db-447fa4832089) | ![Story page](https://github.com/abenartz/ScoresApp/assets/43881667/43a31723-e58e-4c16-b5b6-125637abc891)
+ |
+
 
 ## Features and 3rd party libraries
 - MVVM Jetpack Arcitecture with repository pattern
