@@ -2,8 +2,8 @@ package com.example.scoresapp.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.scoresapp.api.responses.Page
 import com.example.scoresapp.constants.Constants.APP_DEBUG
+import com.example.scoresapp.model.Page
 import com.example.scoresapp.repository.MatchRepository
 import com.example.scoresapp.ui.UiState
 import com.squareup.moshi.JsonDataException

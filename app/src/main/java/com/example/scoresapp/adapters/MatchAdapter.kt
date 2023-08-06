@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.scoresapp.api.responses.MatchData
 import com.example.scoresapp.databinding.MatchListItemBinding
 import com.example.scoresapp.extensions.load
+import com.example.scoresapp.model.MatchData
 
 class MatchAdapter(
     private val onItemClicked: ((MatchData) -> Unit)

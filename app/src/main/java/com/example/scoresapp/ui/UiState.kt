@@ -1,6 +1,7 @@
 package com.example.scoresapp.ui
 
-import com.example.scoresapp.api.responses.MatchData
+import com.example.scoresapp.model.MatchData
+
 
 sealed interface UiState {
     data class Error(val errMsg: String?): UiState

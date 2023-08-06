@@ -7,8 +7,7 @@ import android.widget.Toast
 import androidx.media3.common.MediaItem
 import com.bumptech.glide.Glide
 import com.example.scoresapp.R
-import com.example.scoresapp.api.responses.MatchData
-import com.example.scoresapp.api.responses.Page
+import com.example.scoresapp.model.Page
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -31,12 +30,4 @@ fun ImageView.load(imageUrl: String?) {
         .centerCrop()
         .placeholder(R.drawable.ic_launcher_foreground)
         .into(this)
-}
-
-fun List<Page>.toDurationArray(): LongArray {
-    return this.map { it.duration?.toLong() ?: 0L }.toLongArray()
-}
-
-fun List<Page>.toMediaItems(): List<MediaItem> {
-    return this.map { MediaItem.fromUri(it.videoUrl ?: "") }
 }

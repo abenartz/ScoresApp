@@ -1,4 +1,10 @@
 package com.example.scoresapp.model
 
-class WSCGame {
-}
+
+data class WSCGame(
+    val name: String?,
+    val homeTeamName: String?,
+    val gameId: String?,
+    val gameTime: String?,
+    val primeStory: PrimeStory?
+)
