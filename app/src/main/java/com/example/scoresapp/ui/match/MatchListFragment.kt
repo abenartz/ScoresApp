@@ -9,6 +9,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -22,6 +23,7 @@ import com.example.scoresapp.ui.MainActivity
 import com.example.scoresapp.ui.UiState
 import com.example.scoresapp.utils.TopSpacingItemDecoration
 import com.example.scoresapp.viewmodels.MatchViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -60,19 +62,17 @@ class MatchListFragment: Fragment(R.layout.fragment_match_list) {
 
     private fun subscribeObservers() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.progressBar.showView(state is UiState.Loading)
-                    when (state) {
-                        is UiState.Success -> {
-                            Timber.tag(APP_DEBUG).d("MatchListFragment: subscribeObservers: matches size = ${state.data.size}")
-                            matchAdapter?.submitList(state.data)
-                        }
-                        is UiState.Error -> {
-                            state.errMsg?.let { binding.root.displaySnackBar(it) }
-                        }
-                        else -> {}
+            viewModel.uiState.flowWithLifecycle(lifecycle).collect { state ->
+                binding.progressBar.showView(state is UiState.Loading)
+                when (state) {
+                    is UiState.Success -> {
+                        Timber.tag(APP_DEBUG).d("MatchListFragment: subscribeObservers: matches size = ${state.data.size}")
+                        matchAdapter?.submitList(state.data)
                     }
+                    is UiState.Error -> {
+                        state.errMsg?.let { binding.root.displaySnackBar(it) }
+                    }
+                    else -> {}
                 }
             }
         }
