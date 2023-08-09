@@ -29,7 +29,6 @@
             android:layout_width="@dimen/logo_team_width"
             android:layout_height="@dimen/logo_team_width"
             android:layout_marginEnd="@dimen/margin_logo_from_score"
-            android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/text_score_home"/>
@@ -70,7 +69,6 @@
             android:layout_width="@dimen/logo_team_width"
             android:layout_height="@dimen/logo_team_width"
             android:layout_marginStart="@dimen/margin_logo_from_score"
-            android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/text_score_away"/>

@@ -28,6 +28,6 @@ fun ImageView.load(imageUrl: String?) {
         .with(this)
         .load(imageUrl)
         .centerCrop()
-        .placeholder(R.drawable.ic_launcher_foreground)
+        .placeholder(R.drawable.ic_launcher_background)
         .into(this)
 }
